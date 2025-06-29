@@ -706,3 +706,19 @@
     </script>
 </body>
 </html>
+// TypingPractice.tsx import React, { useState, useEffect, useRef } from 'react'; import { Card, CardContent } from '@/components/ui/card'; import { Button } from '@/components/ui/button';
+
+const sampleText = "Practice typing this sentence to improve your speed and accuracy.";
+
+export default function TypingPractice() { const [userInput, setUserInput] = useState(''); const [started, setStarted] = useState(false); const [timeLeft, setTimeLeft] = useState(60); const [wpm, setWpm] = useState(0); const [accuracy, setAccuracy] = useState(100); const inputRef = useRef(null);
+
+useEffect(() => { let timer: NodeJS.Timeout; if (started && timeLeft > 0) { timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000); } else if (timeLeft === 0) { calculateResults(); setStarted(false); } return () => clearTimeout(timer); }, [started, timeLeft]);
+
+const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => { if (!started) setStarted(true); setUserInput(e.target.value); };
+
+const calculateResults = () => { const wordsTyped = userInput.trim().split(/\s+/).length; const correctChars = userInput.split('').filter((char, i) => char === sampleText[i]).length; const acc = Math.round((correctChars / sampleText.length) * 100); setWpm(wordsTyped); setAccuracy(acc); };
+
+const handleReset = () => { setUserInput(''); setTimeLeft(60); setStarted(false); setWpm(0); setAccuracy(100); inputRef.current?.focus(); };
+
+return ( <div className="max-w-3xl mx-auto p-4 space-y-6"> <Card> <CardContent className="space-y-4"> <h1 className="text-xl font-bold">Typing Practice</h1> <p className="bg-gray-100 p-2 rounded">{sampleText}</p> <textarea ref={inputRef} value={userInput} onChange={handleInputChange} disabled={timeLeft === 0} className="w-full p-2 border rounded h-32" placeholder="Start typing here..." /> <div className="flex justify-between"> <span>Time Left: {timeLeft}s</span> <span>WPM: {wpm}</span> <span>Accuracy: {accuracy}%</span> </div> <Button onClick={handleReset}>Reset</Button> </CardContent> </Card> </div> ); }
+
